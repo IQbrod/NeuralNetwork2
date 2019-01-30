@@ -10,6 +10,7 @@ import numpy as np
 
 import torch.nn as nn
 import torch.nn.functional as F
+import torch.optim as optim
 
 
 #Definition des tailles
@@ -53,6 +54,7 @@ imshow(torchvision.utils.make_grid(images))
 print(' '.join('%5s' % classes[labels[j]] for j in range(train_size)))
 
 
+#Creation du réseau
 class Net(nn.Module):
     def __init__(self):
         super(Net, self).__init__()
@@ -73,3 +75,8 @@ class Net(nn.Module):
         return x
 
 net = Net()
+
+
+#Creation de l'optimiseur
+criterion = nn.CrossEntropyLoss()
+optimizer = optim.SGD(net.parameters(), lr=0.001, momentum=0.9)
