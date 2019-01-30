@@ -1,6 +1,5 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-
 import torch as tor
 import torchvision
 import torchvision.transforms as transforms
@@ -14,7 +13,7 @@ import torch.optim as optim
 
 
 #Definition des tailles
-train_size = 30
+train_size = 8
 test_size = 5
 
 #Creation du tensor
@@ -45,13 +44,13 @@ def imshow(img):
     plt.show()
 
 # get some random training images
-dataiter = iter(trainLoader)
-images, labels = dataiter.next()
+#dataiter = iter(trainLoader)
+#images, labels = dataiter.next()
 
 # show images
-imshow(torchvision.utils.make_grid(images))
+#imshow(torchvision.utils.make_grid(images))
 # print labels
-print(' '.join('%5s' % classes[labels[j]] for j in range(train_size)))
+#print(' '.join('%5s' % classes[labels[j]] for j in range(train_size)))
 
 
 #Creation du réseau
@@ -80,3 +79,31 @@ net = Net()
 #Creation de l'optimiseur
 criterion = nn.CrossEntropyLoss()
 optimizer = optim.SGD(net.parameters(), lr=0.001, momentum=0.9)
+
+
+#Training du réseau
+for epoch in range(2):  # loop over the dataset multiple times
+
+    running_loss = 0.0
+    for i, data in enumerate(trainLoader, 0):
+        # get the inputs
+        inputs, labels = data
+
+        # zero the parameter gradients
+        optimizer.zero_grad()
+
+        # forward + backward + optimize
+        print(inputs)
+        outputs = net(inputs)
+        loss = criterion(outputs, labels)
+        loss.backward()
+        optimizer.step()
+
+        # print statistics
+        running_loss += loss.item()
+        if i % 2000 == 1999:    # print every 2000 mini-batches
+            print('[%d, %5d] loss: %.3f' %
+                  (epoch + 1, i + 1, running_loss / 2000))
+            running_loss = 0.0
+
+print('Finished Training')
