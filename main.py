@@ -13,8 +13,8 @@ import torch.optim as optim
 
 
 #Definition des tailles
-train_size = 8
-test_size = 5
+train_size = 4
+test_size = 4
 
 #Creation du tensor
 transform = transforms.Compose(
@@ -81,7 +81,7 @@ criterion = nn.CrossEntropyLoss()
 optimizer = optim.SGD(net.parameters(), lr=0.001, momentum=0.9)
 
 
-#Training du réseau
+# --- Training du réseau ---
 for epoch in range(2):  # loop over the dataset multiple times
 
     running_loss = 0.0
@@ -93,7 +93,6 @@ for epoch in range(2):  # loop over the dataset multiple times
         optimizer.zero_grad()
 
         # forward + backward + optimize
-        print(inputs)
         outputs = net(inputs)
         loss = criterion(outputs, labels)
         loss.backward()
@@ -107,3 +106,5 @@ for epoch in range(2):  # loop over the dataset multiple times
             running_loss = 0.0
 
 print('Finished Training')
+
+# --- Test du réseau ---
