@@ -119,6 +119,41 @@ outputs = net(images)
 _, predicted = tor.max(outputs, 1)
 
 # Affichage [Verité]: Prédiction
+print()
 for j in range(4):
     sym = "\033[32m✓\033[0m" if labels[j] == predicted[j] else "\033[31m✗\033[0m"
     print("["+classes[labels[j]]+"]: "+classes[predicted[j]]+ " "+sym)
+print()
+
+
+# --- Test sur le jeu entier ---
+correct = 0
+total = 0
+with tor.no_grad():
+    for data in testloader:
+        images, labels = data
+        outputs = net(images)
+        _, predicted = tor.max(outputs.data, 1)
+        total += labels.size(0)
+        correct += (predicted == labels).sum().item()
+
+print('Accuracy of the network on the 10000 test images: %d %%' % (100 * correct / total))
+print()
+
+# --- Test par classe ---
+class_correct = list(0. for i in range(10))
+class_total = list(0. for i in range(10))
+with tor.no_grad():
+    for data in testloader:
+        images, labels = data
+        outputs = net(images)
+        _, predicted = tor.max(outputs, 1)
+        c = (predicted == labels).squeeze()
+        for i in range(4):
+            label = labels[i]
+            class_correct[label] += c[i].item()
+            class_total[label] += 1
+
+
+for i in range(10):
+    print('Accuracy of %5s : %2d %%' % (classes[i], 100 * class_correct[i] / class_total[i]))
