@@ -108,3 +108,17 @@ for epoch in range(2):  # loop over the dataset multiple times
 print('Finished Training')
 
 # --- Test du réseau ---
+# Récuperation du jeu de test
+dataiter = iter(testloader)
+images, labels = dataiter.next()
+
+# Prediction des sorties
+outputs = net(images)
+
+# Recuperation de classe par l'energie
+_, predicted = tor.max(outputs, 1)
+
+# Affichage [Verité]: Prédiction
+for j in range(4):
+    sym = "\033[32m✓\033[0m" if labels[j] == predicted[j] else "\033[31m✗\033[0m"
+    print("["+classes[labels[j]]+"]: "+classes[predicted[j]]+ " "+sym)
