@@ -75,6 +75,18 @@ class Net(nn.Module):
 
 net = Net()
 
+# 1. Couches et sous-couches
+print(net)
+
+
+# 2. Tailles des tenseurs Xn et du poids Wn/Bn
+params = list(net.parameters())
+i = 0
+while i < len(params):
+    print("W"+ str(i//2) +": "+ str(params[i].size()))
+    print("B"+ str(i//2) +": "+ str(params[i+1].size()))
+    i += 2
+print()
 
 #Creation de l'optimiseur
 criterion = nn.CrossEntropyLoss()
