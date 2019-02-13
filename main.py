@@ -52,6 +52,18 @@ def imshow(img):
 # print labels
 #print(' '.join('%5s' % classes[labels[j]] for j in range(train_size)))
 
+#Function to test accuracy on the entire dataset
+def test_nn_accuracy(nt,dataset):
+    correct = 0
+    total = 0
+    with tor.no_grad():
+        for data in dataset:
+            images, labels = data
+            outputs = nt(images)
+            _, predicted = tor.max(outputs.data, 1)
+            total += labels.size(0)
+            correct += (predicted == labels).sum().item()
+    print('\033[1mAccuracy: %d %%\033[0m' % (100 * correct / total))
 
 #Creation du réseau
 class Net(nn.Module):
@@ -74,10 +86,13 @@ class Net(nn.Module):
         return x
 
 net = Net()
+#Creation de l'optimiseur
+criterion = nn.CrossEntropyLoss()
+optimizer = optim.SGD(net.parameters(), lr=0.001, momentum=0.9)
+
 
 # 1. Couches et sous-couches
 print(net)
-
 
 # 2. Tailles des tenseurs Xn et du poids Wn/Bn
 params = list(net.parameters())
@@ -88,14 +103,13 @@ while i < len(params):
     i += 2
 print()
 
-#Creation de l'optimiseur
-criterion = nn.CrossEntropyLoss()
-optimizer = optim.SGD(net.parameters(), lr=0.001, momentum=0.9)
-
+# 3. Affichage pour chaque époque
+print("== Before Training ==")
+test_nn_accuracy(net,testloader)
 
 # --- Training du réseau ---
-for epoch in range(2):  # loop over the dataset multiple times
-
+for epoch in range(3):  # loop over the dataset multiple times
+    print("== Epoch "+str(epoch+1)+" ==")
     running_loss = 0.0
     for i, data in enumerate(trainLoader, 0):
         # get the inputs
@@ -116,6 +130,8 @@ for epoch in range(2):  # loop over the dataset multiple times
             print('[%d, %5d] loss: %.3f' %
                   (epoch + 1, i + 1, running_loss / 2000))
             running_loss = 0.0
+    # 3. Accuracy per epoch
+    test_nn_accuracy(net,testloader)
 
 print('Finished Training')
 
@@ -135,21 +151,6 @@ print()
 for j in range(4):
     sym = "\033[32m✓\033[0m" if labels[j] == predicted[j] else "\033[31m✗\033[0m"
     print("["+classes[labels[j]]+"]: "+classes[predicted[j]]+ " "+sym)
-print()
-
-
-# --- Test sur le jeu entier ---
-correct = 0
-total = 0
-with tor.no_grad():
-    for data in testloader:
-        images, labels = data
-        outputs = net(images)
-        _, predicted = tor.max(outputs.data, 1)
-        total += labels.size(0)
-        correct += (predicted == labels).sum().item()
-
-print('Accuracy of the network on the 10000 test images: %d %%' % (100 * correct / total))
 print()
 
 # --- Test par classe ---
