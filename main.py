@@ -11,6 +11,9 @@ import time
 import torch.nn as nn
 import torch.nn.functional as F
 import torch.optim as optim
+import os
+
+from modelstat import NNStat
 
 
 #Definition des tailles
@@ -29,11 +32,6 @@ trainset = torchvision.datasets.CIFAR10(root='./data', train=True, download=True
 #Entraineur
 trainLoader = tor.utils.data.DataLoader(trainset, batch_size= train_size, shuffle=True, num_workers=2)
 
-#Import d'un jeu de test (sans Training)
-testset = torchvision.datasets.CIFAR10(root='./data', train=False, download=True, transform=transform)
-#Testeur
-testloader = tor.utils.data.DataLoader(testset, batch_size= test_size, shuffle=False, num_workers=2)
-
 #Definition des classes
 classes = ('plane', 'car', 'bird', 'cat', 'deer', 'dog', 'frog', 'horse', 'ship', 'truck')
 
@@ -44,29 +42,6 @@ def imshow(img):
     npimg = img.numpy()
     plt.imshow(np.transpose(npimg, (1, 2, 0)))
     plt.show()
-
-# get some random training images
-#dataiter = iter(trainLoader)
-#images, labels = dataiter.next()
-
-# show images
-#imshow(torchvision.utils.make_grid(images))
-# print labels
-#print(' '.join('%5s' % classes[labels[j]] for j in range(train_size)))
-
-#Function to test accuracy on the entire dataset
-def test_nn_accuracy(nt,dataset):
-    correct = 0
-    total = 0
-    with tor.no_grad():
-        for data in dataset:
-            images, labels = data
-            outputs = nt(images)
-            _, predicted = tor.max(outputs.data, 1)
-            total += labels.size(0)
-            correct += (predicted == labels).sum().item()
-    print('\033[1mAccuracy: %d %%\033[0m' % (100 * correct / total))
-    return (100 * correct / total)
 
 def op_counter(nt,data,display):
     inpt = data[0][0]
@@ -132,7 +107,7 @@ def op_counter(nt,data,display):
     
     nb_conn_oneimg += sIn * sOut
 
-    # -- operation in F2
+    # -- operation in F3
     sIn = sOut
     #sIn = par[8].size()[1]
     sOut = par[8].size()[0]
@@ -172,6 +147,7 @@ class Net(nn.Module):
         return x
 
 net = Net()
+stat = NNStat()
 #Creation de l'optimiseur
 criterion = nn.CrossEntropyLoss()
 optimizer = optim.SGD(net.parameters(), lr=0.001, momentum=0.9)
@@ -194,7 +170,7 @@ print()
 
 # 3. Affichage pour chaque époque
 print("== Before Training ==")
-acc = test_nn_accuracy(net,testloader)
+acc = stat.accuracy(net)
 
 # --- Training du réseau ---
 timeTotal = 0
@@ -224,49 +200,20 @@ for epoch in range(nb_epoch):  # loop over the dataset multiple times
 
     # 3. Accuracy per epoch
     timeTotal += time.time() - timeStart
-    acc = test_nn_accuracy(net,testloader)
+    acc = stat.accuracy(net)
 
-print('Finished Training')
-
-# --- Test du réseau ---
-# Récuperation du jeu de test
-dataiter = iter(testloader)
-images, labels = dataiter.next()
-
-# Prediction des sorties
-outputs = net(images)
-
-# Recuperation de classe par l'energie
-_, predicted = tor.max(outputs, 1)
-
-# Affichage [Verité]: Prédiction
-print()
-for j in range(4):
-    sym = "\033[32m✓\033[0m" if labels[j] == predicted[j] else "\033[31m✗\033[0m"
-    print("["+classes[labels[j]]+"]: "+classes[predicted[j]]+ " "+sym)
-print()
-
-# --- Test par classe ---
-class_correct = list(0. for i in range(10))
-class_total = list(0. for i in range(10))
-with tor.no_grad():
-    for data in testloader:
-        images, labels = data
-        outputs = net(images)
-        _, predicted = tor.max(outputs, 1)
-        c = (predicted == labels).squeeze()
-        for i in range(4):
-            label = labels[i]
-            class_correct[label] += c[i].item()
-            class_total[label] += 1
-
-
-for i in range(10):
-    print('Accuracy of %5s : %2d %%' % (classes[i], 100 * class_correct[i] / class_total[i]))
-print()
+print('Finished Training\n')
 
 # --- Statistiques de l'apprentissage ---
-print("Taux d'erreur global:", 100-acc)
+print("Taux d'erreur global:", str(100-acc) +"%")
 print("Nombre d'operations effectuées:",nbop * nb_epoch)
-print("Temps d'execution (s):", timeTotal)
+print("Temps d'execution (s):", round(timeTotal,2))
 print("Operation / seconde:", (nbop*nb_epoch) / timeTotal)
+
+# --- Save model
+name = "v1"
+model_file = "models/"+name+".pt"
+if not os.path.isfile(model_file):
+    tor.save(net,model_file)
+else:
+    tor.save(net,"models/temp.pt")
