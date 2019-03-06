@@ -61,4 +61,3 @@ class NNStat():
                     
         for i in range(10):
             print('Accuracy of %5s : %2d %%' % (classes[i], 100 * class_correct[i] / class_total[i]))
-        print()
