@@ -36,97 +36,6 @@ trainLoader = tor.utils.data.DataLoader(trainset, batch_size= train_size, shuffl
 #Definition des classes
 classes = ('plane', 'car', 'bird', 'cat', 'deer', 'dog', 'frog', 'horse', 'ship', 'truck')
 
-
-#Fonction d'affichage d'image
-def imshow(img):
-    img = img / 2 + 0.5     # unnormalize
-    npimg = img.numpy()
-    plt.imshow(np.transpose(npimg, (1, 2, 0)))
-    plt.show()
-
-def op_counter(nt,data,display):
-    inpt = data[0][0]
-    par = list(nt.parameters())
-    nb_conn_oneimg = 0
-    nb_red_oneimg = 0
-
-    nBatch = len(data)
-    sBatch = train_size
-    #sBatch = inpt.size()[0]
-
-    # -- Operation in conv1 --
-    xIn = inpt.size()[1]
-    yIn = inpt.size()[2]
-    zIn = inpt.size()[0]
-    zOut = par[0].size()[0]
-    #zIn = par[0].size()[1]
-    xFil = par[0].size()[2]
-    yFil = par[0].size()[3]
-
-    xOut = xIn - (xFil-1) #Conv2d Padding
-    yOut = yIn - (yFil-1) #Conv2d Padding
-
-    nb_conn_oneimg += xOut * yOut * zOut * xFil * yFil * zIn
-
-    # -- Operation in pool1
-    pool_size = 2
-    xOut = (xOut/pool_size)
-    yOut = (yOut/pool_size)
-    nb_red_oneimg += xOut * yOut * zOut
-
-    # -- Operation in conv2
-    xIn = xOut
-    yIn = yOut
-    zIn = zOut
-
-    xFil = par[2].size()[2]
-    xFil = par[2].size()[3]
-
-    xOut = xIn - (xFil-1) #Conv2d Padding
-    yOut = yIn - (yFil-1) #Conv2d Padding
-    zOut = par[2].size()[0]
-
-    nb_conn_oneimg += xOut * yOut * zOut * xFil * yFil * zIn
-
-    # -- Operation in pool2
-    xOut = (xOut/pool_size)
-    yOut = (yOut/pool_size)
-
-    nb_red_oneimg += xOut * yOut * zOut
-
-    # -- Operation in F1
-    sIn = xOut * yOut * zOut
-    #sIn = par[4].size()[1]
-    sOut = par[4].size()[0]
-
-    nb_conn_oneimg += sIn * sOut
-
-    # -- operation in F2
-    sIn = sOut
-    #sIn = par[6].size()[1]
-    sOut = par[6].size()[0]
-    
-    nb_conn_oneimg += sIn * sOut
-
-    # -- operation in F3
-    sIn = sOut
-    #sIn = par[8].size()[1]
-    sOut = par[8].size()[0]
-    
-    nb_conn_oneimg += sIn * sOut
-    
-    if (display):
-        nb_conn = int(nb_conn_oneimg * sBatch * nBatch)
-        nb_red = int(nb_red_oneimg * sBatch * nBatch)
-        total = 2*nb_conn + 3*nb_red
-        print("Operations per epoch on the entire dataset")
-        print("Addition:",nb_conn)
-        print("Multiplication:", nb_conn)
-        print("Maximum:", nb_red * 3)
-        print("Total:", total)
-
-    return total
-
 #Creation du réseau
 name = "v1"
 Net = locate('models.'+name+'.Net')
@@ -150,7 +59,7 @@ while i < len(params):
 print()
 
 # Nombre d'operations du réseau sur les images
-nbop = op_counter(net,trainset,1)
+nbop = net.op_counter(trainset,1)
 print()
 
 # 3. Affichage pour chaque époque
@@ -175,13 +84,6 @@ for epoch in range(nb_epoch):  # loop over the dataset multiple times
         loss = criterion(outputs, labels)
         loss.backward()
         optimizer.step()
-
-        # print statistics
-        #running_loss += loss.item()
-        #if i % 2000 == 1999:
-        #    print('[%d, %5d] loss: %.3f' %
-        #          (epoch + 1, i + 1, running_loss / 2000))
-        #    running_loss = 0.0
 
     # 3. Accuracy per epoch
     timeTotal += time.time() - timeStart
