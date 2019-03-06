@@ -25,6 +25,7 @@ Net = locate('models.'+sys.argv[1]+'.Net')
 mod = tor.load(mfile)
 stat = NNStat()
 
+print()
 stat.accuracy(mod)
 print()
 stat.class_accuracy(mod)

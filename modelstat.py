@@ -33,7 +33,7 @@ class NNStat():
                 _, predicted = tor.max(outputs.data, 1)
                 total += labels.size(0)
                 correct += (predicted == labels).sum().item()
-        print('\033[1mAccuracy: %d %%\033[0m' % (100 * correct / total))
+        print('\033[1mAccuracy:'+str(round((100 * correct / total),2))+'\033[0m')
         return (100 * correct / total)
     
     # Test model on nbim images
