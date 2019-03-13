@@ -18,9 +18,9 @@ from modelstat import NNStat
 
 
 #Definition des tailles
-train_size = 4
+train_size = 16
 test_size = 4
-nb_epoch = 2
+nb_epoch = 12
 
 #Creation du tensor
 transform = transforms.Compose(
@@ -37,7 +37,7 @@ trainLoader = tor.utils.data.DataLoader(trainset, batch_size= train_size, shuffl
 classes = ('plane', 'car', 'bird', 'cat', 'deer', 'dog', 'frog', 'horse', 'ship', 'truck')
 
 #Creation du réseau
-name = "v1"
+name = "v2"
 Net = locate('models.'+name+'.Net')
 
 net = Net()
