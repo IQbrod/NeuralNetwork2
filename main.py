@@ -37,7 +37,7 @@ trainLoader = tor.utils.data.DataLoader(trainset, batch_size= train_size, shuffl
 classes = ('plane', 'car', 'bird', 'cat', 'deer', 'dog', 'frog', 'horse', 'ship', 'truck')
 
 #Creation du réseau
-name = "v2"
+name = "v5"
 Net = locate('models.'+name+'.Net')
 
 net = Net()

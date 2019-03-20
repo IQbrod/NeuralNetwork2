@@ -1,0 +1,27 @@
+== Before Training ==
+Accuracy:10.0
+== Epoch 1 ==
+Accuracy:38.23
+== Epoch 2 ==
+Accuracy:48.68
+== Epoch 3 ==
+Accuracy:53.84
+== Epoch 4 ==
+Accuracy:56.5
+== Epoch 5 ==
+Accuracy:59.36
+== Epoch 6 ==
+Accuracy:61.68
+== Epoch 7 ==
+Accuracy:62.37
+== Epoch 8 ==
+Accuracy:63.61
+== Epoch 9 ==
+Accuracy:65.23
+== Epoch 10 ==
+Accuracy:65.83
+== Epoch 11 ==
+Accuracy:64.9
+== Epoch 12 ==
+Accuracy:65.8
+Finished Training
